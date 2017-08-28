@@ -1,4 +1,4 @@
-import { Mongoose,createConnection, Document, model, connect } from 'mongoose'
+import { Mongoose,createConnection, Document, model } from 'mongoose'
 import { EquipmentBookingHistory } from "../data_model/equipment_booking_history";
 import { EquipmentBooking } from "../data_model/equipment_booking";
 import { EquipmentStatusHistory } from "../data_model/equipment_status_history";
@@ -13,51 +13,51 @@ import { MasterShift } from "../data_model/master_shift";
 function createStatusMaster(): Promise<any> {
     //Production: rpa = 1
     let run = new MasterStatusConfig();
-    run.id = 200;
+    run.statusId = 200;
     run.name = "Production";
     run.rpa = 1;
     run.rpaDescription = "Production";
 
     //Non-Planned Downtime: rpa = 2
     let repairMechanical = new MasterStatusConfig();
-    repairMechanical.id = 301;
+    repairMechanical.statusId = 301;
     repairMechanical.name = "Mechanical Repair";
     repairMechanical.rpa = 2;
     repairMechanical.rpaDescription = "Non-Planned Downtime";
 
     let repairElectrical = new MasterStatusConfig();
-    repairElectrical.id = 302;
+    repairElectrical.statusId = 302;
     repairElectrical.name = "Electrical Repair";
     repairElectrical.rpa = 2;
     repairElectrical.rpaDescription = "Non-Planned Downtime";
 
     let repairPeripheries = new MasterStatusConfig();
-    repairPeripheries.id = 303;
+    repairPeripheries.statusId = 303;
     repairPeripheries.name = "Peripheries Repair";
     repairPeripheries.rpa = 2;
     repairPeripheries.rpaDescription = "Non-Planned Downtime";
 
 	let setup = new MasterStatusConfig();
-    setup.id = 100;
+    setup.statusId = 100;
     setup.name = "Setup";
     setup.rpa = 2;
     setup.rpaDescription = "Setup";
 	
     //Planned Downtime: rpa = 3
     let plannedMaintenance = new MasterStatusConfig();
-    plannedMaintenance.id = 311;
+    plannedMaintenance.statusId = 311;
     plannedMaintenance.name = "Planned Maintenance";
     plannedMaintenance.rpa = 3;
     plannedMaintenance.rpaDescription = "Planned Downtime";
 
     let waitingOrder = new MasterStatusConfig();
-    waitingOrder.id = 312;
+    waitingOrder.statusId = 312;
     waitingOrder.name = "Waiting for new Order";
     waitingOrder.rpa = 3;
     waitingOrder.rpaDescription = "Planned Downtime";
 
     let breaking = new MasterStatusConfig();
-    breaking.id = 313;
+    breaking.statusId = 313;
     breaking.name = "Break";
     breaking.rpa = 3;
     breaking.rpaDescription = "Planned Downtime";
@@ -224,9 +224,7 @@ function initializeData() : Promise<any> {
 }
 
 export function server_data_prepare(): Observable<void | {}> {
-    connect('mongodb://localhost/local');
-    return Observable.defer<void>(() => { return connect('mongodb://localhost/local'); }) 
-    .concatMap(x => Observable.defer<void>(() => { return MasterStatusConfig.remove({}).exec();}))
+    return Observable.defer<void>(() => { return MasterStatusConfig.remove({}).exec(); }) 
     .concatMap(x => Observable.defer<void>(() => { return createStatusMaster(); }))
         .concatMap(x => Observable.defer<void>(() => { return MasterShift.remove({}).exec(); }))
         .concatMap(x => Observable.defer<void>(() => { return createShiftMaster(); }))  
