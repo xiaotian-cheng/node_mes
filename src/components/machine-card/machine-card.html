@@ -1,0 +1,42 @@
+<ion-grid fixed no-padding>
+  <ion-row align-items-stretch>
+    <ion-col col-md-9 col-9 align-self-stretch align-self-center text-center>
+      <div ion-button class='machine-name' [style.background-color] = "machineNameColor" (click)="gotoMachineDetailTab()">
+        {{machine.name}}
+      </div>
+    </ion-col>
+    <ion-col col-md-3 col-3 align-self-end text-right>
+      <div class='machine-status'>{{machine.currentStatus}}</div>
+    </ion-col>
+  </ion-row>
+  <ion-row align-items-stretch>
+    <ion-col col-md-6 col-6 align-self-stretch align-self-center text-left>
+      <div>Current Order: </div>
+    </ion-col>
+    <ion-col col-md-6 col-6 align-self-stretch align-self-center text-right>
+      <div>{{machine.currentOrder}}</div>
+    </ion-col>
+  </ion-row>
+  <ion-row align-items-stretch>
+    <ion-col col-md-6 col-6 align-self-stretch align-self-center text-left>
+      <div>Current Shift: </div>
+    </ion-col>
+    <ion-col col-md-6 col-6 align-self-stretch align-self-center text-right>
+      <div>{{machine.currentShift}}</div>
+    </ion-col>
+  </ion-row>
+  <ion-row align-items-stretch>
+    <ion-col col-md-3 col-3 align-self-stretch align-self-center text-left>
+      <div>Shift Yield: </div>
+    </ion-col>
+    <ion-col col-md-3 col-3 align-self-stretch align-self-center text-center>
+      <div>{{machine.shiftYield}}</div>
+    </ion-col>
+    <ion-col col-md-3 col-3 align-self-stretch align-self-center text-left>
+      <div>Shift Scrap: </div>
+    </ion-col>
+    <ion-col col-md-3 col-3 align-self-stretch align-self-center text-center>
+      <div>{{machine.shiftScrap}}</div>
+    </ion-col>
+  </ion-row>
+</ion-grid>

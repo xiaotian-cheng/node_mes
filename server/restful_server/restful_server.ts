@@ -25,7 +25,7 @@ export class RestfulServer {
     public app: express.Application;
     private port: any;
     private httpServer: Server
-    public connection : ConnectionMgr;
+    public connection: ConnectionMgr;
 
     /**
      * start the restful server
@@ -59,63 +59,64 @@ export class RestfulServer {
         this.app = express();
         this.port = this.normalizePort(process.env.PORT || 3000);
         this.app.set("port", this.port);
-        
-        connect('mongodb://localhost/local',{useMongoClient: true});
-        this.connection = new ConnectionMgr("opc.tcp://127.0.0.1:49320");        
 
-        //configure application
-        this.config();
+        this.connection = new ConnectionMgr("opc.tcp://127.0.0.1:49320");
 
-        //Initialize logic
-        this.init();
-
-        //add routes
-        this.routes();
-
-        //error handling
-        this.app.use(errorHandler());
-
-        console.log("RESTful Server Initialized!")
+        this.connectOpc()
+        .concat(this.connectDb())
+        .concat(this.preRoute())
+        .concat(this.routes())
+        .concat(this.postRoute())
+        .subscribe(x => console.log("RESTful Server Initialized!"));        
     }
 
-    private init() {
-        this.connection.Connect().subscribe(value => console.log("RESTful Server connected to OPC Server"));
+    private connectOpc() {
+        return this.connection.Connect();
     }
 
-    /**
-     * Configure application
-     *
-     * @class Server
-     * @method config
-     */
-    public config() {
-        //use logger middlware
-        this.app.use(logger("dev"));
-        //use json form parser middlware
-        this.app.use(bodyParser.json());
-        //CORS on ExpressJS
-        this.app.use(function (req, res, next) {
-            res.header("Access-Control-Allow-Origin", "*");
-            res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-            next();
-        });
+    private connectDb() {
+        return Observable.create(observer => {
+            connect('mongodb://localhost/local', { useMongoClient: true });
+            observer.complete();
+        })
     }
 
-    /**
-     * Create router
-     *
-     * @class Server
-     * @method api
-     */
-    public routes() {
+    private preRoute() {
+        return Observable.create(observer => {
+            //use logger middlware
+            this.app.use(logger("dev"));
+            //use json form parser middlware
+            this.app.use(bodyParser.json());
+            //CORS on ExpressJS
+            this.app.use(function (req, res, next) {
+                res.header("Access-Control-Allow-Origin", "*");
+                res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+                next();
+            });
+            observer.complete();
+        })
+    }
+
+    private postRoute() {
+        return Observable.create(observer => {
+            this.app.use(errorHandler());
+            observer.complete();
+        })
+    }
+
+    private routes() {
         let router: express.Router;
-        router = express.Router();
 
-        //Route create
-        EquipmentRoute.create(router);
-        OpcRoute.create(router,this.connection);
-        //use router middleware
-        this.app.use(router);
+        return Observable.create(observer => {
+            router = express.Router();
+
+            //Route create
+            EquipmentRoute.create(router);
+            OpcRoute.create(router, this.connection);
+            //use router middleware
+            this.app.use(router);
+            observer.complete();
+        })
     }
 
     private normalizePort(val: any) {

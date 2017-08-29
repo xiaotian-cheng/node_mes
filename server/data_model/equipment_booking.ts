@@ -10,7 +10,7 @@ interface IEquipmentBooking {
     lastChangedSince: Date
 };
 
-interface IEquipmentBookingModel extends IEquipmentBooking, Document { }
+export interface IEquipmentBookingModel extends IEquipmentBooking, Document { }
 
 var equipmentBookingSchema = new Schema({
     name: String,

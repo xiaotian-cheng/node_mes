@@ -165,18 +165,24 @@ function createOrderStatus(): Promise<any> {
     workOrder01.status = "NEW";
     workOrder01.targetQty = 1000;
     workOrder01.partNo = "Part01";
+    workOrder01.yield = 0;
+    workOrder01.scrap = 0;
 
     var workOrder02 = new WorkOrderStatus();
     workOrder02.name = "WO002";
     workOrder02.status = "NEW";
     workOrder02.targetQty = 5000;
     workOrder02.partNo = "Part02";
+    workOrder02.yield = 0;
+    workOrder02.scrap = 0;
 
     var workOrder03 = new WorkOrderStatus();
     workOrder03.name = "WO003";
     workOrder03.status = "NEW";
     workOrder03.targetQty = 8000;
     workOrder03.partNo = "Part03";
+    workOrder03.yield = 0;
+    workOrder03.scrap = 0;
 
     return WorkOrderStatus.insertMany([workOrder01, workOrder02, workOrder03]);
 }
@@ -217,7 +223,15 @@ function initializeData() : Promise<any> {
     booking3.workPart = 'Part03';
     booking3.currentYield = booking3.currentScrap = 0;
     booking3.lastChangedSince = date;
-    
+   
+    //2. Change Equipment Status to Setup
+    inits.push(EquipmentStatus.findOneAndUpdate({name: 'M100'},
+        {$set: {currentStatus: "Setup", lastChangedSince: date}},{new: true}).exec());
+    inits.push(EquipmentStatus.findOneAndUpdate({name: 'M101'},
+        {$set: {currentStatus: "Setup", lastChangedSince: date}},{new: true}).exec());
+    inits.push(EquipmentStatus.findOneAndUpdate({name: 'M102'},
+        {$set: {currentStatus: "Setup", lastChangedSince: date}},{new: true}).exec());
+
     inits.push(EquipmentBooking.insertMany([booking1,booking2,booking3]));
 
     return Promise.all(inits);

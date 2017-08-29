@@ -1,0 +1,22 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Machines</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content class="machine-list">
+  <ion-list [virtualScroll]="machines" approxItemHeight="175px">
+    <ion-grid>
+      <ion-row align-items-stretch>
+        <ion-col col-12 col-md-12 align-self-stretch align-self-center *virtualItem="let machine">
+          <ion-card>
+            <machine-card [machine]='machine'></machine-card>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-list>
+</ion-content>

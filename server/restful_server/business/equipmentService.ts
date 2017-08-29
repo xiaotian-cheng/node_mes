@@ -1,8 +1,11 @@
 import { MasterStatusConfig } from "../../data_model/master_status";
-import { EquipmentConfig } from "../../data_model/equipment_config";
+import { IWorkOrderStatus } from "./../../data_model/workOrder_status";
+import { EquipmentConfig, IEquipmentConfigModel } from "../../data_model/equipment_config";
 import { EquipmentStatus } from "../../data_model/equipment_status";
 import { EquipmentStatusHistory } from "../../data_model/equipment_status_history";
-import { EquipmentBooking } from "../../data_model/equipment_booking";
+import { EquipmentBooking, IEquipmentBookingModel } from "../../data_model/equipment_booking";
+import { WorkOrderStatus, IWorkOrderStatusModel } from "../../data_model/workOrder_status";
+import { EquipmentBookingHistory } from "../../data_model/equipment_booking_history";
 
 export class EquipmentService {
     public static changeStatus(eqpId : string, newStatusName : string) : Promise<any> {
@@ -91,6 +94,110 @@ export class EquipmentService {
                 });
 
                 return results;
+            });
+    }
+
+    public static yield(eqpId: string, yieldChange : number) : Promise<any> {
+        let timeStamp: any = new Date();
+
+        let eqpConfig : IEquipmentConfigModel;
+        let eqpBooking : IEquipmentBookingModel;
+        let workOrder : IWorkOrderStatusModel;
+
+        return EquipmentConfig.findOne({ name: eqpId }).exec()
+            .then(ret => {
+                if (ret == null) throw new Error(eqpId + " not exist");
+                eqpConfig = ret;
+                return EquipmentBooking.findOne({ name: eqpId }).exec();
+            })
+            .then(ret => {
+                if (ret == null) throw new Error(eqpId + " does not have booking");
+                eqpBooking = ret;
+                return WorkOrderStatus.findOne({ name: eqpBooking.workOrder }).exec();
+            })
+            .then(ret => {
+                if (ret == null) throw new Error(eqpBooking.workOrder + " does not exist");
+
+                workOrder = ret;
+
+                let beforeTimeStamp: any = eqpBooking.lastChangedSince;
+
+                //Change Booking
+                eqpBooking.workShift = "Day Shift";
+                eqpBooking.currentYield = eqpBooking.currentYield.valueOf() + yieldChange;
+                eqpBooking.lastChangedSince = timeStamp;
+                eqpBooking.save();
+
+                //Change WorkOrder
+                workOrder.yield = workOrder.yield.valueOf() + yieldChange;
+                workOrder.save();
+
+                //Insert equipment_booking_history
+                let bookingHist = new EquipmentBookingHistory();
+                bookingHist.name = eqpId;
+                bookingHist.bookingType = 'T';
+                bookingHist.workShift = eqpBooking.workShift;
+                bookingHist.workOrder = eqpBooking.workOrder;
+                bookingHist.workPart = eqpBooking.workPart;
+                bookingHist.yield = yieldChange;
+                bookingHist.scrap = 0;
+                bookingHist.duration = ((timeStamp - beforeTimeStamp) / 1000);
+                bookingHist.createTimeStamp = timeStamp;
+                bookingHist.save();
+
+                return;
+            });
+    }
+
+    public static scrap(eqpId: string, scrapChange : number) : Promise<any> {
+        let timeStamp: any = new Date();
+
+        let eqpConfig : IEquipmentConfigModel;
+        let eqpBooking : IEquipmentBookingModel;
+        let workOrder : IWorkOrderStatusModel;
+
+        return EquipmentConfig.findOne({ name: eqpId }).exec()
+            .then(ret => {
+                if (ret == null) throw new Error(eqpId + " not exist");
+                eqpConfig = ret;
+                return EquipmentBooking.findOne({ name: eqpId }).exec();
+            })
+            .then(ret => {
+                if (ret == null) throw new Error(eqpId + " does not have booking");
+                eqpBooking = ret;
+                return WorkOrderStatus.findOne({ name: eqpBooking.workOrder }).exec();
+            })
+            .then(ret => {
+                if (ret == null) throw new Error(eqpBooking.workOrder + " does not exist");
+
+                workOrder = ret;
+
+                let beforeTimeStamp: any = eqpBooking.lastChangedSince;
+
+                //Change Booking
+                eqpBooking.workShift = "Day Shift";
+                eqpBooking.currentScrap = eqpBooking.currentScrap.valueOf() + scrapChange;
+                eqpBooking.lastChangedSince = timeStamp;
+                eqpBooking.save();
+
+                //Change WorkOrder
+                workOrder.scrap = workOrder.scrap.valueOf() + scrapChange;
+                workOrder.save();
+
+                //Insert equipment_booking_history
+                let bookingHist = new EquipmentBookingHistory();
+                bookingHist.name = eqpId;
+                bookingHist.bookingType = 'T';
+                bookingHist.workShift = eqpBooking.workShift;
+                bookingHist.workOrder = eqpBooking.workOrder;
+                bookingHist.workPart = eqpBooking.workPart;
+                bookingHist.scrap = scrapChange;
+                bookingHist.yield = 0;
+                bookingHist.duration = ((timeStamp - beforeTimeStamp) / 1000);
+                bookingHist.createTimeStamp = timeStamp;
+                bookingHist.save();
+
+                return;
             });
     }
 }

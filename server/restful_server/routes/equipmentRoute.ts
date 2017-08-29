@@ -19,6 +19,14 @@ export class EquipmentRoute {
             EquipmentRoute.status(req, res, next);
         });
 
+        //add yield/scrap route
+        router.put("/equipment/:equipmentId/yield", (req: Request, res: Response, next: NextFunction) => {
+            EquipmentRoute.yield(req, res, next);
+        });
+        router.put("/equipment/:equipmentId/scrap", (req: Request, res: Response, next: NextFunction) => {
+            EquipmentRoute.scrap(req, res, next);
+        });
+
         //add equipments route
         router.get("/equipments", (req: Request, res: Response, next: NextFunction) => {
             EquipmentRoute.fetchEquipments(req, res, next);
@@ -40,6 +48,32 @@ export class EquipmentRoute {
         let newStatusName = req.body.newStatus;
 
         EquipmentService.changeStatus(eqpId, newStatusName)
+            .then(() => {
+                res.json(true);
+            })
+            .catch(err => {
+                next(err);
+            });
+    }
+
+    public static yield(req: Request, res: Response, next: NextFunction) {
+        let eqpId = req.params.equipmentId;
+        let yieldChange = req.body.yield;
+
+        EquipmentService.yield(eqpId, yieldChange)
+            .then(() => {
+                res.json(true);
+            })
+            .catch(err => {
+                next(err);
+            });
+    }
+
+    public static scrap(req: Request, res: Response, next: NextFunction) {
+        let eqpId = req.params.equipmentId;
+        let scrapChange = req.body.scrap;
+
+        EquipmentService.scrap(eqpId, scrapChange)
             .then(() => {
                 res.json(true);
             })

@@ -1,0 +1,10 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Machine Details</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-tabs [selectedIndex]="mySelectedIndex">
+  <ion-tab [root]="oeeRoot" tabTitle="Oee" [rootParams]="{machine: machine,name: machine.name}" tabIcon="calendar"></ion-tab>
+  <ion-tab [root]="scrapRoot" tabTitle="Scraps" [rootParams]="{machine: machine,name: machine.name}" tabIcon="contacts"></ion-tab>
+</ion-tabs>

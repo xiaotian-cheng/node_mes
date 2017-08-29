@@ -60,9 +60,7 @@ export class ConnectionMgr {
 
     public WriteValue(nodeId: string, value: any) : Observable<any> {
         if (this.the_session.hasBeenClosed()) throw Error("Not Connected yet !");
-        return this.writeValue$.call(this.the_session, nodeId,value).map(err => {
-            if (err != null) throw err;
-        });
+        return this.writeValue$.call(this.the_session, nodeId,value);
     }
 
     public ReadValue(nodeId: string | [string]): Observable<DataValue> {

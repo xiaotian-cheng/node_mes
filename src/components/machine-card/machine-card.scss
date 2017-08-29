@@ -1,0 +1,17 @@
+machine-card {
+    .machine-name{
+        font-size: 3.4em;
+        border-radius: 6px;
+        display: block;
+        margin: 0.4rem 0.4rem;
+        height: 1.2em;
+    }
+
+    .grid{
+        margin: 0px;
+    }
+
+    .row{
+        padding: 0.3em 0.6em;
+    }
+}

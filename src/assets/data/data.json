@@ -1,0 +1,15 @@
+{
+  "machinesKPI": [{
+    "name": "M-101",
+    "fromDateTime": "",
+    "toDateTime": "",
+    "totalAvailableTime": 10000,
+    "availableTime": 9990,
+    "planDownTime":{"Planned Maintenance" : 100, "Break": 200},
+    "unPlandDownTime": {"Setup": 100, "Mechanical Repair": 500},
+    "partProduced": {"Part1" : {"part": "Part1", "workOrder": "Order1","produced": 100, "targetCycle": 22}, 
+                    "Part2" : {"part": "Part2", "workOrder": "Order2","produced": 300, "targetCycle": 19}},
+    "totalYield": 1900,
+    "totalScrap": 100
+  }]
+}

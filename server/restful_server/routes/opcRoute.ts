@@ -9,9 +9,10 @@ import { EquipmentConfig } from "../../data_model/equipment_config";
 import { IMasterStatusConfig, MasterStatusConfig } from "../../data_model/master_status";
 import { EquipmentService } from "../business/equipmentService";
 import { ConnectionMgr } from "../../opc_connection";
+import { Variant, DataType } from "node-opcua";
 
 export class OpcRoute {
-    private static connection : ConnectionMgr;
+    private static connection: ConnectionMgr;
 
     public static create(router: Router, connection: ConnectionMgr) {
         OpcRoute.connection = connection;
@@ -29,8 +30,13 @@ export class OpcRoute {
         let nodeId = req.body.nodeId;
         let value = req.body.newValue;
 
-        OpcRoute.connection.WriteValue(nodeId,value)
-        .subscribe(x=> res.json(true),err => next(err));
+        OpcRoute.connection.WriteValue(nodeId, new Variant({ dataType: DataType.Int32, value: value }))
+            .subscribe(x => {
+                res.json(true);
+            }
+            , err => {
+                next(err);
+            });
     }
 
     public static status(req: Request, res: Response, next: NextFunction) {
